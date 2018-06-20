@@ -1,7 +1,7 @@
 pollutantmean <- function(directory, pollutant, id = 1:332){
-  ## 'directory' is a character vector of lenght 1 indicating the location of the CSV files
+  ## 'directory' is a character vector of length 1 indicating the location of the CSV files
   
-  ## 'pollutant' is a character vecotr of lenght 1 indicating the name of the pollutant 
+  ## 'pollutant' is a character vecotr of length 1 indicating the name of the pollutant 
   ## for which we will calculate the mean, either "sulfate" or "nitrate."
   
   ## 'id' is an integer vector indicating the monitor ID numbers to be used.
@@ -24,7 +24,7 @@ pollutantmean <- function(directory, pollutant, id = 1:332){
 }
 
 complete <- function(directory, id=1:332) {
-  ##'directory' is a character vector of lenght 1 indicating the location of the CSV files
+  ##'directory' is a character vector of length 1 indicating the location of the CSV files
   
   ## 'id' is an integer vector indicating the monitor ID numbers to be used
   
@@ -42,10 +42,12 @@ complete <- function(directory, id=1:332) {
   for (i in id) {
     tempdataframe <- data.frame()
     tempdataframe <- read.csv(monitorfiles[i])
-  
+    
+    ## Evaluate complete cases and add the sum to monitordata
     monitordata <- rbind(monitordata, data.frame(i, nrow(tempdataframe[complete.cases(tempdataframe), ])))
    
   }
+  ## Label result
   names(monitordata) <- c("id", "nobs")
   monitordata
   
@@ -54,7 +56,7 @@ complete <- function(directory, id=1:332) {
 corr <- function(directory, threshold = 0){
   ## 'directory is a character vector of length 1 indicating the location of the CSV files
   
-  ## 'threshold' is a character vecotr of lenght 1 indicating the number of completely observed 
+  ## 'threshold' is a character vector of length 1 indicating the number of completely observed 
   ## observations (on all variables) required to compute the correlation between nitrate and sulfate, 
   ## the default is 0
   
@@ -70,15 +72,16 @@ corr <- function(directory, threshold = 0){
   
   ## Put the requested monitor files into the data frame
   for (i in 1:id) {
+    
+    ## Calculate the number of complete observations
     nobscomplete <- complete(directory, i)
     
-    
+    ## If the number of complete observations is greater than the threshold, 
+    ## Add the correlation to the data frame
     if (nobscomplete[2] > threshold){
       tempdataframe <- data.frame()
       tempdataframe <- read.csv(monitorfiles[i])
       
-      y <- tempdataframe$sulfate
-      z <- tempdataframe$nitrate
       x <- cor(tempdataframe$sulfate, tempdataframe$nitrate, use = "pairwise.complete.obs")
       corrdata <- c(corrdata, x)
     }
